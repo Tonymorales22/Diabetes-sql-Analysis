@@ -1,4 +1,14 @@
--- KPI: Quantity of non diabetic/diabetic patients and prevalence of diabetes in the dataset
+/*==========================================================
+03 – Glucose KPI Analysis
+Dataset: Pima Indians Diabetes
+Purpose: Analyze glucose-related risk factors and their
+         association with diabetes incidence.
+==========================================================*/
+
+
+/*==========================================================
+KPI 1 – Diabetes vs Non-Diabetes Count
+==========================================================*/
 SELECT
 	SUM(CASE WHEN outcome = 0 THEN 1 ELSE 0 END ) AS non_diabetic_patient,
 	SUM(CASE WHEN outcome = 1 THEN 1 ELSE 0 END ) AS diabetic_patient,
@@ -6,14 +16,38 @@ SELECT
     / COUNT(*) AS diabetes_rate
 FROM patients_diabetes_clean;
 
---KPI: Glucose values on non diabetic and diabetic patients
+/*
+INSIGHT:
+There are nearly twice as many non-diabetic patients as diabetic ones.
+The overall diabetes prevalence in the dataset is approximately 34.9%.
+
+Because the diabetic group is significantly smaller, statistical estimates
+involving diabetic patients may be slightly less stable compared to those 
+based on non-diabetic patients.
+*/
+
+/*==========================================================
+KPI 2 – Average Glucose by Outcome
+==========================================================*/
 SELECT 
 	outcome,
 	AVG(glucose) AS avg_glucose 
 	FROM patients_diabetes_clean
 GROUP BY outcome;
 
--- KPI: Diabetes rate by glucose ranges (clinical classification)
+/*
+INSIGHT:
+Diabetic patients show substantially higher average glucose levels than 
+non-diabetic patients (an approximate difference of ~30 mg/dL). 
+
+This confirms the clinical relevance of glucose as a strong indicator of
+diabetes risk.
+*/
+
+
+/*==========================================================
+KPI 3 – Diabetes Rate by Glucose Ranges (Clinical Categories)
+==========================================================*/
 SELECT
     CASE
         WHEN glucose < 100 THEN '<100 (Normal)'
@@ -41,6 +75,18 @@ GROUP BY
         ELSE 'Unknown'
     END
 ORDER BY diabetes_rate;
+/*
+INSIGHT:
+Patients with glucose ≥140 mg/dL exhibit a diabetes rate close to 70%, 
+more than double the rate observed in the 100–139 mg/dL range (~31%). 
+
+Meanwhile, patients in the normal glucose range (<100 mg/dL) show a very low 
+diabetes rate (<10%). 
+
+This gradient clearly demonstrates the strong association between elevated 
+glucose levels and diabetes risk.
+*/
+
 
 /*
 ==========================================================
@@ -64,3 +110,14 @@ SELECT
     COUNT(*) AS prob_high_glucose_given_diabetes
 FROM patients_diabetes_clean
 WHERE outcome = 1;
+/*
+INSIGHT:
+The probability of having diabetes given high glucose levels (glucose ≥140)
+is very high, close to 70%. This means elevated glucose is a strong predictor 
+of diabetes.
+
+However, the probability of having high glucose among diabetic patients is 
+significantly lower, indicating that high glucose is not a strict requirement 
+for diabetes diagnosis. This asymmetry highlights why conditional analysis is 
+essential when studying clinical risk factors.
+*/
